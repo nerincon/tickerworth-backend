@@ -37,7 +37,7 @@ def updateCompanyListing():
   if env == "production":
     listings = get_api_companies_list()
   else:
-    listings = get_api_dev
+    listings = get_api_dev()
   for company in listings:
     cur.execute("INSERT INTO companylist VALUES (DEFAULT,%s, %s, %s, %s, %s)",(company['symbol'], company['name'], company['date'], company['type'], company['iexId']))
     conn.commit()
@@ -69,20 +69,21 @@ def companyListing():
 companyListing()
 
 class MainHandler(tornado.web.RequestHandler):
-  def get (self):
+  def get (self, slug):
     print("setting headers!!!")
     self.set_header("Access-Control-Allow-Origin", "*")
     self.set_header("Access-Control-Allow-Headers", "x-requested-with")
     self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
     print('getting something')
-    r = requests.get('https://api.iextrading.com/1.0/stock/aapl/financials')
+    # symbol = self.get_query_argument('symbol', None)
+    r = requests.get('https://api.iextrading.com/1.0/stock/'+ slug + '/financials?period=annual')
     tempdata = r.json()
-    print(tempdata['symbol'])
+    # print(tempdata['symbol'])
     self.write(tempdata)
 
 
 def make_app():
-  return tornado.web.Application([(r"/api", MainHandler)])
+  return tornado.web.Application([(r"/fin/([^/]+)", MainHandler)])
 
 
 if __name__ == "__main__":
