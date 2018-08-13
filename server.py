@@ -82,8 +82,59 @@ class MainHandler(tornado.web.RequestHandler):
     self.write(tempdata)
 
 
+class CompanyNameHandler(tornado.web.RequestHandler):
+  def get(self, slug):
+    print("setting headers!!!")
+    self.set_header("Access-Control-Allow-Origin", "*")
+    self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+    self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+    print('getting company name')
+    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    cur = conn.cursor()
+    cur.execute("SELECT name FROM companylist WHERE symbol = (%s)", [slug])
+    company_name = cur.fetchone()
+    company_name_dict = {'compname': x for x in company_name}
+    self.write(company_name_dict)
+
+class LogoHandler(tornado.web.RequestHandler):
+  def get (self, slug):
+    print("setting headers!!!")
+    self.set_header("Access-Control-Allow-Origin", "*")
+    self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+    self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+    print('getting image')
+    r = requests.get('https://api.iextrading.com/1.0/stock/'+ slug + '/logo')
+    logodata = r.json()
+    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    cur = conn.cursor()
+    cur.execute("SELECT symbol FROM companyimage WHERE symbol = (%s)", [slug])
+    in_db = cur.fetchone()
+    if in_db:
+      cur.execute("SELECT url FROM companyimage WHERE symbol = (%s)", [slug])
+      logo = cur.fetchone()
+      logo_dict = {'url': x for x in logo}
+      print('getting logo from DB')
+      print('logodata from api: ' , logodata)
+      print('url from db (modified): ' , logo_dict)
+      self.write(logo_dict)
+      cur.close()
+      conn.close()
+    else:
+      cur.execute("INSERT INTO companyimage VALUES (DEFAULT,%s, %s)",(slug, logodata['url']))
+      conn.commit()
+      cur.execute("SELECT url FROM companyimage WHERE symbol = (%s)", [slug])
+      logo = cur.fetchone()
+      logo_dict = {'url': x for x in logo}
+      print('inserting logo to DB and getting it back from DB')
+      print('logodata from api: ' , logodata)
+      print('url from db (modified): ' , logo_dict)
+      self.write(logo_dict)
+      cur.close()
+      conn.close()
+
+
 def make_app():
-  return tornado.web.Application([(r"/fin/([^/]+)", MainHandler)])
+  return tornado.web.Application([(r"/fin/([^/]+)", MainHandler), (r"/logo/([^/]+)", LogoHandler), (r"/name/([^/]+)", CompanyNameHandler)])
 
 
 if __name__ == "__main__":
