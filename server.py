@@ -3,8 +3,8 @@ import tornado.ioloop
 import tornado.web
 import tornado.log
 import psycopg2
-from datetime import datetime
-from apifuncs import get_api_companies_list, get_api_dev
+from datetime import datetime, timedelta
+from apifuncs import get_api_companies_list, get_api_dev, get_api_financials, get_api_financials_cache
 
 
 import json
@@ -68,18 +68,29 @@ def companyListing():
 
 companyListing()
 
-class MainHandler(tornado.web.RequestHandler):
+
+
+
+class KeyFinancialsHandler(tornado.web.RequestHandler):
   def get (self, slug):
     print("setting headers!!!")
     self.set_header("Access-Control-Allow-Origin", "*")
     self.set_header("Access-Control-Allow-Headers", "x-requested-with")
     self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
-    print('getting something')
-    # symbol = self.get_query_argument('symbol', None)
-    r = requests.get('https://api.iextrading.com/1.0/stock/'+ slug + '/financials?period=annual')
-    tempdata = r.json()
-    # print(tempdata['symbol'])
-    self.write(tempdata)
+    dt = datetime.utcnow()
+    timeDelta = timedelta(minutes=1440)
+    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    cur = conn.cursor()
+    cur.execute("SELECT time_stamp FROM keyfinancials WHERE symbol = (%s)", [slug])
+    row = cur.fetchone()
+    db_timestamp = row[0]
+    print('db_timestamp: ', db_timestamp)
+    if db_timestamp == None:
+      get_api_financials(self, slug)
+    elif (dt - db_timestamp) < timeDelta:
+      get_api_financials_cache(self, slug)
+    else:
+      get_api_financials(self, slug)
 
 
 class CompanyNameHandler(tornado.web.RequestHandler):
@@ -95,6 +106,8 @@ class CompanyNameHandler(tornado.web.RequestHandler):
     company_name = cur.fetchone()
     company_name_dict = {'compname': x for x in company_name}
     self.write(company_name_dict)
+    cur.close()
+    conn.close()
 
 class LogoHandler(tornado.web.RequestHandler):
   def get (self, slug):
@@ -134,7 +147,7 @@ class LogoHandler(tornado.web.RequestHandler):
 
 
 def make_app():
-  return tornado.web.Application([(r"/fin/([^/]+)", MainHandler), (r"/logo/([^/]+)", LogoHandler), (r"/name/([^/]+)", CompanyNameHandler)])
+  return tornado.web.Application([(r"/fin/([^/]+)", KeyFinancialsHandler), (r"/logo/([^/]+)", LogoHandler), (r"/name/([^/]+)", CompanyNameHandler)])
 
 
 if __name__ == "__main__":

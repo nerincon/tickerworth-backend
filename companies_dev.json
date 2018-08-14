@@ -2,7 +2,7 @@
     {
       "symbol": "A",
       "name": "Agilent Technologies Inc.",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "cs",
       "iexId": "2"
@@ -10,7 +10,7 @@
     {
       "symbol": "AA",
       "name": "Alcoa Corporation",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "cs",
       "iexId": "12042"
@@ -18,7 +18,7 @@
     {
       "symbol": "AABA",
       "name": "Altaba Inc.",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "cs",
       "iexId": "7653"
@@ -26,7 +26,7 @@
     {
       "symbol": "AAC",
       "name": "AAC Holdings Inc.",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "cs",
       "iexId": "9169"
@@ -34,7 +34,7 @@
     {
       "symbol": "AADR",
       "name": "AdvisorShares Dorsey Wright ADR",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "et",
       "iexId": "5"
@@ -42,7 +42,7 @@
     {
       "symbol": "AAL",
       "name": "American Airlines Group Inc.",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "cs",
       "iexId": "8148"
@@ -50,7 +50,7 @@
     {
       "symbol": "AAMC",
       "name": "Altisource Asset Management Corp Com",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "cs",
       "iexId": "7760"
@@ -58,7 +58,7 @@
     {
       "symbol": "AAME",
       "name": "Atlantic American Corporation",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "cs",
       "iexId": "7"
@@ -66,7 +66,7 @@
     {
       "symbol": "AAN",
       "name": "Aaron's Inc.",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "cs",
       "iexId": "8"
@@ -74,7 +74,7 @@
     {
       "symbol": "AAOI",
       "name": "Applied Optoelectronics Inc.",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "cs",
       "iexId": "7790"
@@ -82,7 +82,7 @@
     {
       "symbol": "AAON",
       "name": "AAON Inc.",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "cs",
       "iexId": "9"
@@ -90,7 +90,7 @@
     {
       "symbol": "AAP",
       "name": "Advance Auto Parts Inc W/I",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "cs",
       "iexId": "10"
@@ -98,7 +98,7 @@
     {
       "symbol": "AAPL",
       "name": "Apple Inc.",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "cs",
       "iexId": "11"
@@ -106,7 +106,7 @@
     {
       "symbol": "AAT",
       "name": "American Assets Trust Inc.",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "cs",
       "iexId": "12"
@@ -114,7 +114,7 @@
     {
       "symbol": "AAU",
       "name": "Almaden Minerals Ltd.",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "cs",
       "iexId": "13"
@@ -122,7 +122,7 @@
     {
       "symbol": "AAV",
       "name": "Advantage Oil & Gas Ltd",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "cs",
       "iexId": "14"
@@ -130,7 +130,7 @@
     {
       "symbol": "AAWW",
       "name": "Atlas Air Worldwide Holdings",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "cs",
       "iexId": "15"
@@ -138,7 +138,7 @@
     {
       "symbol": "AAXJ",
       "name": "iShares MSCI All Country Asia ex Japan Index Fund",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "et",
       "iexId": "16"
@@ -146,7 +146,7 @@
     {
       "symbol": "AAXN",
       "name": "Axon Enterprise Inc.",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "cs",
       "iexId": "6667"
@@ -154,7 +154,7 @@
     {
       "symbol": "AB",
       "name": "AllianceBernstein Holding L.P. Units",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "cs",
       "iexId": "17"
@@ -162,7 +162,7 @@
     {
       "symbol": "ABAC",
       "name": "Renmin Tianli Group Inc.",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "cs",
       "iexId": "5129"
@@ -170,7 +170,7 @@
     {
       "symbol": "ABB",
       "name": "ABB Ltd",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "cs",
       "iexId": "19"
@@ -178,7 +178,7 @@
     {
       "symbol": "ABBV",
       "name": "AbbVie Inc.",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "cs",
       "iexId": "20"
@@ -186,7 +186,7 @@
     {
       "symbol": "ABC",
       "name": "AmerisourceBergen Corporation",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "cs",
       "iexId": "21"
@@ -194,7 +194,7 @@
     {
       "symbol": "ABCB",
       "name": "Ameris Bancorp",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "cs",
       "iexId": "22"
@@ -202,7 +202,7 @@
     {
       "symbol": "ABCD",
       "name": "Cambium Learning Group Inc.",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "cs",
       "iexId": "23"
@@ -210,7 +210,7 @@
     {
       "symbol": "ABDC",
       "name": "Alcentra Capital Corp.",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "cs",
       "iexId": "8607"
@@ -218,7 +218,7 @@
     {
       "symbol": "ABEO",
       "name": "Abeona Therapeutics Inc.",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "cs",
       "iexId": "9600"
@@ -226,7 +226,7 @@
     {
       "symbol": "ABEOW",
       "name": "",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "N/A",
       "iexId": "9607"
@@ -234,7 +234,7 @@
     {
       "symbol": "ABEV",
       "name": "Ambev S.A. American Depositary Shares (Each representing 1)",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "cs",
       "iexId": "36"
@@ -242,7 +242,7 @@
     {
       "symbol": "ABG",
       "name": "Asbury Automotive Group Inc",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "cs",
       "iexId": "26"
@@ -250,7 +250,7 @@
     {
       "symbol": "ABIL",
       "name": "Ability Inc.",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "cs",
       "iexId": "10960"
@@ -258,7 +258,7 @@
     {
       "symbol": "ABIO",
       "name": "ARCA biopharma Inc.",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "cs",
       "iexId": "28"
@@ -266,7 +266,7 @@
     {
       "symbol": "ABM",
       "name": "ABM Industries Incorporated",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "cs",
       "iexId": "29"
@@ -274,7 +274,7 @@
     {
       "symbol": "ABMD",
       "name": "ABIOMED Inc.",
-      "date": "2018-08-12",
+      "date": "2018-08-13",
       "isEnabled": true,
       "type": "cs",
       "iexId": "30"
