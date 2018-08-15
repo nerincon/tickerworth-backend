@@ -61,3 +61,48 @@ def get_api_financials_cache(self, slug):
     self.write({'findata_db': findata_db})
     cur.close()
     conn.close()
+
+
+def get_api_stats(self, slug):
+    print('requesting API for key stats')
+    r = requests.get('https://api.iextrading.com/1.0/stock/'+ slug + '/stats')
+    statsdata = r.json()
+    statsdata_list = []
+    statsdata_list.append(statsdata)
+    dt = datetime.utcnow()
+    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    cur = conn.cursor()
+    cur.execute("DELETE FROM keystats WHERE symbol = (%s)", [slug])
+    for stats in statsdata_list:
+        cur.execute("""INSERT INTO keystats VALUES (DEFAULT,%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+        (dt, stats['companyName'], stats['marketcap'], stats['beta'], stats['week52high'], stats['week52low'], stats['week52change'], stats['dividendRate'], 
+        stats['dividendYield'], stats['exDividendDate'], stats['latestEPS'], stats['latestEPSDate'], stats['sharesOutstanding'], stats['returnOnEquity'], 
+        stats['consensusEPS'], stats['symbol'], stats['EBITDA'], stats['revenue'], stats['grossProfit'], stats['cash'], stats['debt'], stats['ttmEPS'], 
+        stats['revenuePerShare'], stats['peRatioHigh'], stats['peRatioLow'], stats['returnOnAssets'], stats['returnOnCapital'], stats['profitMargin'], 
+        stats['priceToSales'], stats['priceToBook']))
+        conn.commit()
+    cur.execute("""SELECT marketcap, beta, week52high, week52low, week52change, dividendrate, dividendyield, to_char(exdividenddate, 'YYYY:MM:DD'), latesteps, to_char(latestepsdate, 'YYYY:MM:DD'), 
+    sharesoutstanding, returnonequity, concensuseps, ebitda::float8::numeric::money, revenue::float8::numeric::money, grossprofit::float8::numeric::money,
+    cash::float8::numeric::money, debt::float8::numeric::money, ttmeps, revenuepershare, peratiohigh, peratiolow, returnonassets, returnoncapital, 
+    profitmargin, pricetosales, pricetobook FROM keystats WHERE symbol = (%s)""", [slug])
+    statsdata_db = [dict((cur.description[i][0], value) \
+                for i, value in enumerate(row)) for row in cur.fetchall()]
+    print('stats data from DB (API call first): ', statsdata_db)
+    self.write({'statsdata_db': statsdata_db})
+    cur.close()
+    conn.close()
+
+
+def get_api_stats_cache(self, slug):
+    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    cur = conn.cursor()
+    cur.execute("""SELECT marketcap, beta, week52high, week52low, week52change, dividendrate, dividendyield, to_char(exdividenddate, 'YYYY:MM:DD'), latesteps, to_char(latestepsdate, 'YYYY:MM:DD'), 
+    sharesoutstanding, returnonequity, concensuseps, ebitda::float8::numeric::money, revenue::float8::numeric::money, grossprofit::float8::numeric::money,
+    cash::float8::numeric::money, debt::float8::numeric::money, ttmeps, revenuepershare, peratiohigh, peratiolow, returnonassets, returnoncapital, 
+    profitmargin, pricetosales, pricetobook FROM keystats WHERE symbol = (%s)""", [slug])
+    statsdata_db = [dict((cur.description[i][0], value) \
+                for i, value in enumerate(row)) for row in cur.fetchall()]
+    print('stats data from DB (cache): ', statsdata_db)
+    self.write({'statsdata_db': statsdata_db})
+    cur.close()
+    conn.close()
