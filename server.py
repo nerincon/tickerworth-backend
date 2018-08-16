@@ -4,7 +4,7 @@ import tornado.web
 import tornado.log
 import psycopg2
 from datetime import datetime, timedelta
-from apifuncs import get_api_companies_list, get_api_dev, get_api_financials, get_api_financials_cache, get_api_stats, get_api_stats_cache
+from apifuncs import get_api_companies_list, get_api_dev, get_api_financials, get_api_financials_cache, get_api_stats, get_api_stats_cache, get_tr_chart_data, get_cr_chart_data, get_gp_chart_data, get_oe_chart_data, get_oi_chart_data, get_ni_chart_data
 
 
 import json
@@ -138,8 +138,6 @@ class CompanyLogoHandler(tornado.web.RequestHandler):
     self.set_header("Access-Control-Allow-Headers", "x-requested-with")
     self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
     print('getting image')
-    r = requests.get('https://api.iextrading.com/1.0/stock/'+ slug + '/logo')
-    logodata = r.json()
     conn = psycopg2.connect("dbname=tickerworth user=postgres")
     cur = conn.cursor()
     cur.execute("SELECT symbol FROM companyimage WHERE symbol = (%s)", [slug])
@@ -149,12 +147,13 @@ class CompanyLogoHandler(tornado.web.RequestHandler):
       logo = cur.fetchone()
       logo_dict = {'url': x for x in logo}
       print('getting logo from DB')
-      print('logodata from api: ' , logodata)
       print('url from db (modified): ' , logo_dict)
       self.write(logo_dict)
       cur.close()
       conn.close()
     else:
+      r = requests.get('https://api.iextrading.com/1.0/stock/'+ slug + '/logo')
+      logodata = r.json()
       cur.execute("INSERT INTO companyimage VALUES (DEFAULT,%s, %s)",(slug, logodata['url']))
       conn.commit()
       cur.execute("SELECT url FROM companyimage WHERE symbol = (%s)", [slug])
@@ -168,12 +167,72 @@ class CompanyLogoHandler(tornado.web.RequestHandler):
       conn.close()
 
 
+class ChartTRHandler(tornado.web.RequestHandler):
+  def get (self, slug):
+    print("setting headers!!!")
+    self.set_header("Access-Control-Allow-Origin", "*")
+    self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+    self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+    get_tr_chart_data(self, slug)
+
+
+class ChartCRHandler(tornado.web.RequestHandler):
+  def get (self, slug):
+    print("setting headers!!!")
+    self.set_header("Access-Control-Allow-Origin", "*")
+    self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+    self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+    get_cr_chart_data(self, slug)
+
+
+class ChartGPHandler(tornado.web.RequestHandler):
+  def get (self, slug):
+    print("setting headers!!!")
+    self.set_header("Access-Control-Allow-Origin", "*")
+    self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+    self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+    get_gp_chart_data(self, slug)
+
+
+class ChartOEHandler(tornado.web.RequestHandler):
+  def get (self, slug):
+    print("setting headers!!!")
+    self.set_header("Access-Control-Allow-Origin", "*")
+    self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+    self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+    get_oe_chart_data(self, slug)
+
+
+class ChartOIHandler(tornado.web.RequestHandler):
+  def get (self, slug):
+    print("setting headers!!!")
+    self.set_header("Access-Control-Allow-Origin", "*")
+    self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+    self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+    get_oi_chart_data(self, slug)
+
+
+class ChartNIHandler(tornado.web.RequestHandler):
+  def get (self, slug):
+    print("setting headers!!!")
+    self.set_header("Access-Control-Allow-Origin", "*")
+    self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+    self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+    get_ni_chart_data(self, slug)
+
+
 def make_app():
   return tornado.web.Application([
     (r"/fin/([^/]+)", CompanyKeyFinancialsHandler),
     (r"/logo/([^/]+)", CompanyLogoHandler),
     (r"/name/([^/]+)", CompanyNameHandler),
-    (r"/stats/([^/]+)", CompanyKeyStatsHandler)])
+    (r"/stats/([^/]+)", CompanyKeyStatsHandler),
+    (r"/trchart/([^/]+)", ChartTRHandler),
+    (r"/crchart/([^/]+)", ChartCRHandler),
+    (r"/gpchart/([^/]+)", ChartGPHandler),
+    (r"/oechart/([^/]+)", ChartOEHandler),
+    (r"/oichart/([^/]+)", ChartOIHandler),
+    (r"/nichart/([^/]+)", ChartNIHandler)])
 
 
 if __name__ == "__main__":

@@ -22,7 +22,6 @@ CREATE TABLE keystats (
   week52change DOUBLE PRECISION,
   dividendrate DOUBLE PRECISION,
   dividendyield DOUBLE PRECISION,
-  exdividenddate DATE,
   latesteps DOUBLE PRECISION,
   latestepsdate DATE,
   sharesoutstanding BIGINT,

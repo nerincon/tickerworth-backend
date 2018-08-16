@@ -18,6 +18,73 @@ def get_api_companies_list():
     companies_list = r.json()
     return companies_list
 
+
+def get_tr_chart_data(self, slug):
+    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    cur = conn.cursor()
+    cur.execute("SELECT to_char(reportdate, 'YYYY:MM:DD') as x, totalrevenue as y FROM keyfinancials  WHERE symbol = (%s)", [slug])
+    tr_data = [dict((cur.description[i][0], value) for i, value in enumerate(row)) for row in cur.fetchall()]
+    tr_data_json = json.dumps(tr_data)
+    self.write(tr_data_json)
+    cur.close()
+    conn.close()
+
+
+def get_cr_chart_data(self, slug):
+    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    cur = conn.cursor()
+    cur.execute("SELECT to_char(reportdate, 'YYYY:MM:DD') as x, costofrevenue as y FROM keyfinancials  WHERE symbol = (%s)", [slug])
+    cr_data = [dict((cur.description[i][0], value) for i, value in enumerate(row)) for row in cur.fetchall()]
+    cr_data_json = json.dumps(cr_data)
+    self.write(cr_data_json)
+    cur.close()
+    conn.close()
+
+
+def get_gp_chart_data(self, slug):
+    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    cur = conn.cursor()
+    cur.execute("SELECT to_char(reportdate, 'YYYY:MM:DD') as x, grossprofit as y FROM keyfinancials  WHERE symbol = (%s)", [slug])
+    gp_data = [dict((cur.description[i][0], value) for i, value in enumerate(row)) for row in cur.fetchall()]
+    gp_data_json = json.dumps(gp_data)
+    self.write(gp_data_json)
+    cur.close()
+    conn.close()
+
+
+def get_oe_chart_data(self, slug):
+    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    cur = conn.cursor()
+    cur.execute("SELECT to_char(reportdate, 'YYYY:MM:DD') as x, operatingexpense as y FROM keyfinancials  WHERE symbol = (%s)", [slug])
+    oe_data = [dict((cur.description[i][0], value) for i, value in enumerate(row)) for row in cur.fetchall()]
+    oe_data_json = json.dumps(oe_data)
+    self.write(oe_data_json)
+    cur.close()
+    conn.close()
+
+
+def get_oi_chart_data(self, slug):
+    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    cur = conn.cursor()
+    cur.execute("SELECT to_char(reportdate, 'YYYY:MM:DD') as x, operatingincome as y FROM keyfinancials  WHERE symbol = (%s)", [slug])
+    oi_data = [dict((cur.description[i][0], value) for i, value in enumerate(row)) for row in cur.fetchall()]
+    oi_data_json = json.dumps(oi_data)
+    self.write(oi_data_json)
+    cur.close()
+    conn.close()
+
+
+def get_ni_chart_data(self, slug):
+    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    cur = conn.cursor()
+    cur.execute("SELECT to_char(reportdate, 'YYYY:MM:DD') as x, netincome as y FROM keyfinancials  WHERE symbol = (%s)", [slug])
+    ni_data = [dict((cur.description[i][0], value) for i, value in enumerate(row)) for row in cur.fetchall()]
+    ni_data_json = json.dumps(ni_data)
+    self.write(ni_data_json)
+    cur.close()
+    conn.close()
+
+
 def get_api_financials(self, slug):
     print('requesting API for key financials')
     r = requests.get('https://api.iextrading.com/1.0/stock/'+ slug + '/financials?period=annual')
@@ -41,7 +108,7 @@ def get_api_financials(self, slug):
     keyfinancials WHERE symbol = (%s)""", [slug])
     findata_db = [dict((cur.description[i][0], value) \
                 for i, value in enumerate(row)) for row in cur.fetchall()]
-    print('fin data from DB (API call first): ', findata_db)
+    print('fin data from DB (API call first): ')
     self.write({'findata_db': findata_db})
     cur.close()
     conn.close()
@@ -57,8 +124,9 @@ def get_api_financials_cache(self, slug):
     keyfinancials WHERE symbol = (%s)""", [slug])
     findata_db = [dict((cur.description[i][0], value) \
                 for i, value in enumerate(row)) for row in cur.fetchall()]
-    print('fin data from DB (cache): ', findata_db)
-    self.write({'findata_db': findata_db})
+    print('fin data from DB (cache): ')
+    findata_json = json.dumps(findata_db)
+    self.write(findata_json)
     cur.close()
     conn.close()
 
@@ -74,20 +142,20 @@ def get_api_stats(self, slug):
     cur = conn.cursor()
     cur.execute("DELETE FROM keystats WHERE symbol = (%s)", [slug])
     for stats in statsdata_list:
-        cur.execute("""INSERT INTO keystats VALUES (DEFAULT,%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+        cur.execute("""INSERT INTO keystats VALUES (DEFAULT,%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
         (dt, stats['companyName'], stats['marketcap'], stats['beta'], stats['week52high'], stats['week52low'], stats['week52change'], stats['dividendRate'], 
-        stats['dividendYield'], stats['exDividendDate'], stats['latestEPS'], stats['latestEPSDate'], stats['sharesOutstanding'], stats['returnOnEquity'], 
+        stats['dividendYield'], stats['latestEPS'], stats['latestEPSDate'], stats['sharesOutstanding'], stats['returnOnEquity'], 
         stats['consensusEPS'], stats['symbol'], stats['EBITDA'], stats['revenue'], stats['grossProfit'], stats['cash'], stats['debt'], stats['ttmEPS'], 
         stats['revenuePerShare'], stats['peRatioHigh'], stats['peRatioLow'], stats['returnOnAssets'], stats['returnOnCapital'], stats['profitMargin'], 
         stats['priceToSales'], stats['priceToBook']))
         conn.commit()
-    cur.execute("""SELECT marketcap, beta, week52high, week52low, week52change, dividendrate, dividendyield, to_char(exdividenddate, 'YYYY:MM:DD'), latesteps, to_char(latestepsdate, 'YYYY:MM:DD'), 
+    cur.execute("""SELECT marketcap, beta, week52high, week52low, week52change, dividendrate, dividendyield, latesteps, to_char(latestepsdate, 'YYYY:MM:DD'), 
     sharesoutstanding, returnonequity, concensuseps, ebitda::float8::numeric::money, revenue::float8::numeric::money, grossprofit::float8::numeric::money,
     cash::float8::numeric::money, debt::float8::numeric::money, ttmeps, revenuepershare, peratiohigh, peratiolow, returnonassets, returnoncapital, 
     profitmargin, pricetosales, pricetobook FROM keystats WHERE symbol = (%s)""", [slug])
     statsdata_db = [dict((cur.description[i][0], value) \
                 for i, value in enumerate(row)) for row in cur.fetchall()]
-    print('stats data from DB (API call first): ', statsdata_db)
+    print('stats data from DB (API call first): ')
     self.write({'statsdata_db': statsdata_db})
     cur.close()
     conn.close()
@@ -96,13 +164,13 @@ def get_api_stats(self, slug):
 def get_api_stats_cache(self, slug):
     conn = psycopg2.connect("dbname=tickerworth user=postgres")
     cur = conn.cursor()
-    cur.execute("""SELECT marketcap, beta, week52high, week52low, week52change, dividendrate, dividendyield, to_char(exdividenddate, 'YYYY:MM:DD'), latesteps, to_char(latestepsdate, 'YYYY:MM:DD'), 
+    cur.execute("""SELECT marketcap, beta, week52high, week52low, week52change, dividendrate, dividendyield, latesteps, to_char(latestepsdate, 'YYYY:MM:DD'), 
     sharesoutstanding, returnonequity, concensuseps, ebitda::float8::numeric::money, revenue::float8::numeric::money, grossprofit::float8::numeric::money,
     cash::float8::numeric::money, debt::float8::numeric::money, ttmeps, revenuepershare, peratiohigh, peratiolow, returnonassets, returnoncapital, 
     profitmargin, pricetosales, pricetobook FROM keystats WHERE symbol = (%s)""", [slug])
     statsdata_db = [dict((cur.description[i][0], value) \
                 for i, value in enumerate(row)) for row in cur.fetchall()]
-    print('stats data from DB (cache): ', statsdata_db)
+    print('stats data from DB (cache): ')
     self.write({'statsdata_db': statsdata_db})
     cur.close()
     conn.close()
