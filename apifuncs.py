@@ -149,7 +149,7 @@ def get_api_stats(self, slug):
         stats['revenuePerShare'], stats['peRatioHigh'], stats['peRatioLow'], stats['returnOnAssets'], stats['returnOnCapital'], stats['profitMargin'], 
         stats['priceToSales'], stats['priceToBook']))
         conn.commit()
-    cur.execute("""SELECT marketcap, beta, week52high, week52low, week52change, dividendrate, dividendyield, latesteps, to_char(latestepsdate, 'YYYY:MM:DD'), 
+    cur.execute("""SELECT marketcap::float8::numeric::money, beta, week52high, week52low, week52change, dividendrate, dividendyield, latesteps, to_char(latestepsdate, 'YYYY:MM:DD'), 
     sharesoutstanding, returnonequity, concensuseps, ebitda::float8::numeric::money, revenue::float8::numeric::money, grossprofit::float8::numeric::money,
     cash::float8::numeric::money, debt::float8::numeric::money, ttmeps, revenuepershare, peratiohigh, peratiolow, returnonassets, returnoncapital, 
     profitmargin, pricetosales, pricetobook FROM keystats WHERE symbol = (%s)""", [slug])
@@ -164,7 +164,7 @@ def get_api_stats(self, slug):
 def get_api_stats_cache(self, slug):
     conn = psycopg2.connect("dbname=tickerworth user=postgres")
     cur = conn.cursor()
-    cur.execute("""SELECT marketcap, beta, week52high, week52low, week52change, dividendrate, dividendyield, latesteps, to_char(latestepsdate, 'YYYY:MM:DD'), 
+    cur.execute("""SELECT marketcap::float8::numeric::money, beta, week52high, week52low, week52change, dividendrate, dividendyield, latesteps, to_char(latestepsdate, 'YYYY:MM:DD'), 
     sharesoutstanding, returnonequity, concensuseps, ebitda::float8::numeric::money, revenue::float8::numeric::money, grossprofit::float8::numeric::money,
     cash::float8::numeric::money, debt::float8::numeric::money, ttmeps, revenuepershare, peratiohigh, peratiolow, returnonassets, returnoncapital, 
     profitmargin, pricetosales, pricetobook FROM keystats WHERE symbol = (%s)""", [slug])
