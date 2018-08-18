@@ -174,3 +174,35 @@ def get_api_stats_cache(self, slug):
     self.write({'statsdata_db': statsdata_db})
     cur.close()
     conn.close()
+
+
+def get_api_news(self, slug):
+    print('requesting API for company news')
+    r = requests.get('https://api.iextrading.com/1.0/stock/'+ slug + '/news/last/50')
+    newsdata = r.json()
+    dt = datetime.utcnow()
+    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    cur = conn.cursor()
+    cur.execute("DELETE FROM companynews WHERE symbol = (%s)", [slug])
+    for report in newsdata:
+        cur.execute("""INSERT INTO companynews VALUES (DEFAULT,%s, %s, %s, %s, %s, %s, %s, %s)""",
+        (slug, dt, report['datetime'], report['headline'], report['source'], report['url'], report['summary'], report['image']))
+        conn.commit()
+    cur.execute("""SELECT to_char(newsdate, 'YYYY:MM:DD') as newsdate, headline, source, url, summary FROM companynews WHERE symbol = (%s)""", [slug])
+    newsdata_db = [dict((cur.description[i][0], value) \
+                for i, value in enumerate(row)) for row in cur.fetchall()]
+    newsdata_json = json.dumps(newsdata_db)
+    self.write(newsdata_json)
+    cur.close()
+    conn.close()
+
+def get_api_news_cache(self, slug):
+    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    cur = conn.cursor()
+    cur.execute("""SELECT to_char(newsdate, 'YYYY:MM:DD') as newsdate, headline, source, url, summary FROM companynews WHERE symbol = (%s)""", [slug])
+    newsdata_db = [dict((cur.description[i][0], value) \
+                for i, value in enumerate(row)) for row in cur.fetchall()]
+    newsdata_json = json.dumps(newsdata_db)
+    self.write(newsdata_json)
+    cur.close()
+    conn.close()

@@ -75,3 +75,15 @@ CREATE TABLE companyimage (
   symbol VARCHAR,
   url VARCHAR
 );
+
+CREATE TABLE companynews (
+  id SERIAL NOT NULL PRIMARY KEY,
+  symbol VARCHAR,
+  time_stamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  newsdate DATE,
+  headline VARCHAR,
+  source VARCHAR,
+  url VARCHAR,
+  summary VARCHAR,
+  image VARCHAR
+);

@@ -4,7 +4,7 @@ import tornado.web
 import tornado.log
 import psycopg2
 from datetime import datetime, timedelta
-from apifuncs import get_api_companies_list, get_api_dev, get_api_financials, get_api_financials_cache, get_api_stats, get_api_stats_cache, get_tr_chart_data, get_cr_chart_data, get_gp_chart_data, get_oe_chart_data, get_oi_chart_data, get_ni_chart_data
+from apifuncs import get_api_companies_list, get_api_dev, get_api_financials, get_api_financials_cache, get_api_stats, get_api_stats_cache, get_tr_chart_data, get_cr_chart_data, get_gp_chart_data, get_oe_chart_data, get_oi_chart_data, get_ni_chart_data, get_api_news, get_api_news_cache
 
 
 import json
@@ -92,6 +92,27 @@ class CompanyKeyFinancialsHandler(tornado.web.RequestHandler):
     else:
       get_api_financials(self, slug)
 
+
+class CompanyNewsHandler(tornado.web.RequestHandler):
+  def get (self, slug):
+    print("setting headers!!!")
+    self.set_header("Access-Control-Allow-Origin", "*")
+    self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+    self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+    dt = datetime.utcnow()
+    timeDelta = timedelta(minutes=1440)
+    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    cur = conn.cursor()
+    cur.execute("SELECT time_stamp FROM companynews WHERE symbol = (%s) LIMIT 1", [slug])
+    row = cur.fetchone()
+    if row != None:
+      db_timestamp = row[0]
+    if row == None:
+      get_api_news(self, slug)
+    elif (dt - db_timestamp) < timeDelta:
+      get_api_news_cache(self, slug)
+    else:
+      get_api_news(self, slug)
 
 class CompanyKeyStatsHandler(tornado.web.RequestHandler):
   def get (self, slug):
@@ -224,6 +245,7 @@ class ChartNIHandler(tornado.web.RequestHandler):
 def make_app():
   return tornado.web.Application([
     (r"/fin/([^/]+)", CompanyKeyFinancialsHandler),
+    (r"/news/([^/]+)", CompanyNewsHandler),
     (r"/logo/([^/]+)", CompanyLogoHandler),
     (r"/name/([^/]+)", CompanyNameHandler),
     (r"/stats/([^/]+)", CompanyKeyStatsHandler),
