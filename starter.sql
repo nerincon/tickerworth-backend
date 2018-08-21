@@ -87,3 +87,15 @@ CREATE TABLE companynews (
   summary VARCHAR,
   image VARCHAR
 );
+
+CREATE TABLE companymaininfo (
+  id SERIAL NOT NULL PRIMARY KEY,
+  symbol VARCHAR,
+  time_stamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  website VARCHAR,
+  industry VARCHAR,
+  exchange VARCHAR,
+  ceo VARCHAR,
+  sector VARCHAR,
+  description VARCHAR
+);
