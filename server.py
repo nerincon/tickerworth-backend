@@ -77,7 +77,7 @@ companyListing()
 
 
 class CompanyMainHandler(tornado.web.RequestHandler):
-  def get (self, slug):
+  def get (self, ticker):
     print("setting headers!!!")
     self.set_header("Access-Control-Allow-Origin", "*")
     self.set_header("Access-Control-Allow-Headers", "x-requested-with")
@@ -86,16 +86,16 @@ class CompanyMainHandler(tornado.web.RequestHandler):
     timeDelta = timedelta(minutes=1440)
     conn = psycopg2.connect("dbname=tickerworth user=postgres")
     cur = conn.cursor()
-    cur.execute("SELECT time_stamp FROM companymaininfo WHERE symbol = (%s) LIMIT 1", [slug])
+    cur.execute("SELECT time_stamp FROM companymaininfo WHERE symbol = (%s) LIMIT 1", [ticker])
     row = cur.fetchone()
     if row != None:
       db_timestamp = row[0]
     if row == None:
-      get_api_main(self, slug)
+      get_api_main(self, ticker)
     elif (dt - db_timestamp) < timeDelta:
-      get_api_main_cache(self, slug)
+      get_api_main_cache(self, ticker)
     else:
-      get_api_main(self, slug)
+      get_api_main(self, ticker)
 
 
 
@@ -172,7 +172,7 @@ class monte_carlo(tornado.web.RequestHandler):
 
 
 class CompanyKeyFinancialsHandler(tornado.web.RequestHandler):
-  def get (self, slug):
+  def get (self, ticker):
     print("setting headers!!!")
     self.set_header("Access-Control-Allow-Origin", "*")
     self.set_header("Access-Control-Allow-Headers", "x-requested-with")
@@ -181,20 +181,20 @@ class CompanyKeyFinancialsHandler(tornado.web.RequestHandler):
     timeDelta = timedelta(minutes=1440)
     conn = psycopg2.connect("dbname=tickerworth user=postgres")
     cur = conn.cursor()
-    cur.execute("SELECT time_stamp FROM keyfinancials WHERE symbol = (%s) LIMIT 1", [slug])
+    cur.execute("SELECT time_stamp FROM keyfinancials WHERE symbol = (%s) LIMIT 1", [ticker])
     row = cur.fetchone()
     if row != None:
       db_timestamp = row[0]
     if row == None:
-      get_api_financials(self, slug)
+      get_api_financials(self, ticker)
     elif (dt - db_timestamp) < timeDelta:
-      get_api_financials_cache(self, slug)
+      get_api_financials_cache(self, ticker)
     else:
-      get_api_financials(self, slug)
+      get_api_financials(self, ticker)
 
 
 class CompanyNewsHandler(tornado.web.RequestHandler):
-  def get (self, slug):
+  def get (self, ticker):
     print("setting headers!!!")
     self.set_header("Access-Control-Allow-Origin", "*")
     self.set_header("Access-Control-Allow-Headers", "x-requested-with")
@@ -203,21 +203,21 @@ class CompanyNewsHandler(tornado.web.RequestHandler):
     timeDelta = timedelta(minutes=1440)
     conn = psycopg2.connect("dbname=tickerworth user=postgres")
     cur = conn.cursor()
-    cur.execute("SELECT time_stamp FROM companynews WHERE symbol = (%s) LIMIT 1", [slug])
+    cur.execute("SELECT time_stamp FROM companynews WHERE symbol = (%s) LIMIT 1", [ticker])
     row = cur.fetchone()
     if row != None:
       db_timestamp = row[0]
     if row == None:
-      get_api_news(self, slug)
+      get_api_news(self, ticker)
     elif (dt - db_timestamp) < timeDelta:
-      get_api_news_cache(self, slug)
+      get_api_news_cache(self, ticker)
     else:
-      get_api_news(self, slug)
+      get_api_news(self, ticker)
 
 
 
 class CompanyKeyStatsHandler(tornado.web.RequestHandler):
-  def get (self, slug):
+  def get (self, ticker):
     print("setting headers!!!")
     self.set_header("Access-Control-Allow-Origin", "*")
     self.set_header("Access-Control-Allow-Headers", "x-requested-with")
@@ -226,20 +226,20 @@ class CompanyKeyStatsHandler(tornado.web.RequestHandler):
     timeDelta = timedelta(minutes=1440)
     conn = psycopg2.connect("dbname=tickerworth user=postgres")
     cur = conn.cursor()
-    cur.execute("SELECT time_stamp FROM keystats WHERE symbol = (%s) LIMIT 1", [slug])
+    cur.execute("SELECT time_stamp FROM keystats WHERE symbol = (%s) LIMIT 1", [ticker])
     row = cur.fetchone()
     if row != None:
       db_timestamp = row[0]
     if row == None:
-      get_api_stats(self, slug)
+      get_api_stats(self, ticker)
     elif (dt - db_timestamp) < timeDelta:
-      get_api_stats_cache(self, slug)
+      get_api_stats_cache(self, ticker)
     else:
-      get_api_stats(self, slug)
+      get_api_stats(self, ticker)
 
 
 class CompanyNameHandler(tornado.web.RequestHandler):
-  def get(self, slug):
+  def get(self, ticker):
     print("setting headers!!!")
     self.set_header("Access-Control-Allow-Origin", "*")
     self.set_header("Access-Control-Allow-Headers", "x-requested-with")
@@ -247,7 +247,7 @@ class CompanyNameHandler(tornado.web.RequestHandler):
     print('getting company name')
     conn = psycopg2.connect("dbname=tickerworth user=postgres")
     cur = conn.cursor()
-    cur.execute("SELECT name FROM companylist WHERE symbol = (%s)", [slug])
+    cur.execute("SELECT name FROM companylist WHERE symbol = (%s)", [ticker])
     company_name = cur.fetchone()
     company_name_dict = {'compname': x for x in company_name}
     self.write(company_name_dict)
@@ -255,7 +255,7 @@ class CompanyNameHandler(tornado.web.RequestHandler):
     conn.close()
 
 class CompanyLogoHandler(tornado.web.RequestHandler):
-  def get (self, slug):
+  def get (self, ticker):
     print("setting headers!!!")
     self.set_header("Access-Control-Allow-Origin", "*")
     self.set_header("Access-Control-Allow-Headers", "x-requested-with")
@@ -263,10 +263,10 @@ class CompanyLogoHandler(tornado.web.RequestHandler):
     print('getting image')
     conn = psycopg2.connect("dbname=tickerworth user=postgres")
     cur = conn.cursor()
-    cur.execute("SELECT symbol FROM companyimage WHERE symbol = (%s)", [slug])
+    cur.execute("SELECT symbol FROM companyimage WHERE symbol = (%s)", [ticker])
     in_db = cur.fetchone()
     if in_db:
-      cur.execute("SELECT url FROM companyimage WHERE symbol = (%s)", [slug])
+      cur.execute("SELECT url FROM companyimage WHERE symbol = (%s)", [ticker])
       logo = cur.fetchone()
       logo_dict = {'url': x for x in logo}
       print('getting logo from DB')
@@ -275,11 +275,11 @@ class CompanyLogoHandler(tornado.web.RequestHandler):
       cur.close()
       conn.close()
     else:
-      r = requests.get('https://api.iextrading.com/1.0/stock/'+ slug + '/logo')
+      r = requests.get('https://api.iextrading.com/1.0/stock/'+ ticker + '/logo')
       logodata = r.json()
-      cur.execute("INSERT INTO companyimage VALUES (DEFAULT,%s, %s)",(slug, logodata['url']))
+      cur.execute("INSERT INTO companyimage VALUES (DEFAULT,%s, %s)",(ticker, logodata['url']))
       conn.commit()
-      cur.execute("SELECT url FROM companyimage WHERE symbol = (%s)", [slug])
+      cur.execute("SELECT url FROM companyimage WHERE symbol = (%s)", [ticker])
       logo = cur.fetchone()
       logo_dict = {'url': x for x in logo}
       print('inserting logo to DB and getting it back from DB')
@@ -290,144 +290,175 @@ class CompanyLogoHandler(tornado.web.RequestHandler):
       conn.close()
 
 
-class ChartTRHandler(tornado.web.RequestHandler):
-  def get (self, slug):
+class CompanyPriceHandler(tornado.web.RequestHandler):
+  def get (self, ticker):
     print("setting headers!!!")
     self.set_header("Access-Control-Allow-Origin", "*")
     self.set_header("Access-Control-Allow-Headers", "x-requested-with")
     self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
-    get_tr_chart_data(self, slug)
+    print('getting price')
+    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    cur = conn.cursor()
+    cur.execute("SELECT symbol FROM companyprice WHERE symbol = (%s)", [ticker])
+    in_db = cur.fetchone()
+    if in_db:
+      cur.execute("SELECT price FROM companyprice WHERE symbol = (%s)", [ticker])
+      price = cur.fetchone()
+      price_dict = {'price': x for x in price}
+      self.write(price_dict)
+      cur.close()
+      conn.close()
+    else:
+      r = requests.get('https://api.iextrading.com/1.0/stock/'+ ticker + '/price')
+      pricedata = r.json()
+      cur.execute("INSERT INTO companyprice VALUES (DEFAULT,%s, %s)",(ticker, pricedata))
+      conn.commit()
+      cur.execute("SELECT price FROM companyprice WHERE symbol = (%s)", [ticker])
+      price = cur.fetchone()
+      price_dict = {'price': x for x in price}
+      self.write(price_dict)
+      cur.close()
+      conn.close()
+
+
+class ChartTRHandler(tornado.web.RequestHandler):
+  def get (self, ticker):
+    print("setting headers!!!")
+    self.set_header("Access-Control-Allow-Origin", "*")
+    self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+    self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+    get_tr_chart_data(self, ticker)
 
 
 class ChartCRHandler(tornado.web.RequestHandler):
-  def get (self, slug):
+  def get (self, ticker):
     print("setting headers!!!")
     self.set_header("Access-Control-Allow-Origin", "*")
     self.set_header("Access-Control-Allow-Headers", "x-requested-with")
     self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
-    get_cr_chart_data(self, slug)
+    get_cr_chart_data(self, ticker)
 
 
 class ChartGPHandler(tornado.web.RequestHandler):
-  def get (self, slug):
+  def get (self, ticker):
     print("setting headers!!!")
     self.set_header("Access-Control-Allow-Origin", "*")
     self.set_header("Access-Control-Allow-Headers", "x-requested-with")
     self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
-    get_gp_chart_data(self, slug)
+    get_gp_chart_data(self, ticker)
 
 
 class ChartOEHandler(tornado.web.RequestHandler):
-  def get (self, slug):
+  def get (self, ticker):
     print("setting headers!!!")
     self.set_header("Access-Control-Allow-Origin", "*")
     self.set_header("Access-Control-Allow-Headers", "x-requested-with")
     self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
-    get_oe_chart_data(self, slug)
+    get_oe_chart_data(self, ticker)
 
 
 class ChartOIHandler(tornado.web.RequestHandler):
-  def get (self, slug):
+  def get (self, ticker):
     print("setting headers!!!")
     self.set_header("Access-Control-Allow-Origin", "*")
     self.set_header("Access-Control-Allow-Headers", "x-requested-with")
     self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
-    get_oi_chart_data(self, slug)
+    get_oi_chart_data(self, ticker)
 
 
 class ChartNIHandler(tornado.web.RequestHandler):
-  def get (self, slug):
+  def get (self, ticker):
     print("setting headers!!!")
     self.set_header("Access-Control-Allow-Origin", "*")
     self.set_header("Access-Control-Allow-Headers", "x-requested-with")
     self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
-    get_ni_chart_data(self, slug)
+    get_ni_chart_data(self, ticker)
 
 class ChartCAHandler(tornado.web.RequestHandler):
-  def get (self, slug):
+  def get (self, ticker):
     print("setting headers!!!")
     self.set_header("Access-Control-Allow-Origin", "*")
     self.set_header("Access-Control-Allow-Headers", "x-requested-with")
     self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
-    get_ca_chart_data(self, slug)
+    get_ca_chart_data(self, ticker)
 
 class ChartTAHandler(tornado.web.RequestHandler):
-  def get (self, slug):
+  def get (self, ticker):
     print("setting headers!!!")
     self.set_header("Access-Control-Allow-Origin", "*")
     self.set_header("Access-Control-Allow-Headers", "x-requested-with")
     self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
-    get_ta_chart_data(self, slug)
+    get_ta_chart_data(self, ticker)
 
 class ChartTLHandler(tornado.web.RequestHandler):
-  def get (self, slug):
+  def get (self, ticker):
     print("setting headers!!!")
     self.set_header("Access-Control-Allow-Origin", "*")
     self.set_header("Access-Control-Allow-Headers", "x-requested-with")
     self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
-    get_tl_chart_data(self, slug)
+    get_tl_chart_data(self, ticker)
 
 class ChartCCHandler(tornado.web.RequestHandler):
-  def get (self, slug):
+  def get (self, ticker):
     print("setting headers!!!")
     self.set_header("Access-Control-Allow-Origin", "*")
     self.set_header("Access-Control-Allow-Headers", "x-requested-with")
     self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
-    get_cc_chart_data(self, slug)
+    get_cc_chart_data(self, ticker)
 
 class ChartCDHandler(tornado.web.RequestHandler):
-  def get (self, slug):
+  def get (self, ticker):
     print("setting headers!!!")
     self.set_header("Access-Control-Allow-Origin", "*")
     self.set_header("Access-Control-Allow-Headers", "x-requested-with")
     self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
-    get_cd_chart_data(self, slug)
+    get_cd_chart_data(self, ticker)
 
 class ChartTCHandler(tornado.web.RequestHandler):
-  def get (self, slug):
+  def get (self, ticker):
     print("setting headers!!!")
     self.set_header("Access-Control-Allow-Origin", "*")
     self.set_header("Access-Control-Allow-Headers", "x-requested-with")
     self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
-    get_tc_chart_data(self, slug)
+    get_tc_chart_data(self, ticker)
 
 class ChartTDHandler(tornado.web.RequestHandler):
-  def get (self, slug):
+  def get (self, ticker):
     print("setting headers!!!")
     self.set_header("Access-Control-Allow-Origin", "*")
     self.set_header("Access-Control-Allow-Headers", "x-requested-with")
     self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
-    get_td_chart_data(self, slug)
+    get_td_chart_data(self, ticker)
 
 
 class ChartSEHandler(tornado.web.RequestHandler):
-  def get (self, slug):
+  def get (self, ticker):
     print("setting headers!!!")
     self.set_header("Access-Control-Allow-Origin", "*")
     self.set_header("Access-Control-Allow-Headers", "x-requested-with")
     self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
-    get_se_chart_data(self, slug)
+    get_se_chart_data(self, ticker)
 
 
 class ChartCFHandler(tornado.web.RequestHandler):
-  def get (self, slug):
+  def get (self, ticker):
     print("setting headers!!!")
     self.set_header("Access-Control-Allow-Origin", "*")
     self.set_header("Access-Control-Allow-Headers", "x-requested-with")
     self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
-    get_cf_chart_data(self, slug)
+    get_cf_chart_data(self, ticker)
 
 class ChartOGLHandler(tornado.web.RequestHandler):
-  def get (self, slug):
+  def get (self, ticker):
     print("setting headers!!!")
     self.set_header("Access-Control-Allow-Origin", "*")
     self.set_header("Access-Control-Allow-Headers", "x-requested-with")
     self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
-    get_ogl_chart_data(self, slug)
+    get_ogl_chart_data(self, ticker)
 
 
 class CompanyDDMHandler(tornado.web.RequestHandler):
-  def get (self, slug):
+  def get (self, ticker):
     print("setting headers!!!")
     self.set_header("Access-Control-Allow-Origin", "*")
     self.set_header("Access-Control-Allow-Headers", "x-requested-with")
@@ -436,16 +467,17 @@ class CompanyDDMHandler(tornado.web.RequestHandler):
     timeDelta = timedelta(minutes=1440)
     conn = psycopg2.connect("dbname=tickerworth user=postgres")
     cur = conn.cursor()
-    cur.execute("SELECT time_stamp FROM companyddm WHERE symbol = (%s) LIMIT 1", [slug])
+    cur.execute("SELECT time_stamp FROM companyddm WHERE symbol = (%s) LIMIT 1", [ticker])
     row = cur.fetchone()
     if row != None:
       db_timestamp = row[0]
     if row == None:
-      get_api_ddm(self, slug)
+      get_api_ddm(self, ticker)
     elif (dt - db_timestamp) < timeDelta:
-      get_api_ddm_cache(self, slug)
+      get_api_ddm_cache(self, ticker)
     else:
-      get_api_ddm(self, slug)
+      cur.execute("DELETE FROM companyddm WHERE symbol = (%s)", [ticker])
+      get_api_ddm(self, ticker)
 
 
 def make_app():
@@ -456,6 +488,7 @@ def make_app():
     (r"/ddm/([^/]+)", CompanyDDMHandler),
     (r"/news/([^/]+)", CompanyNewsHandler),
     (r"/logo/([^/]+)", CompanyLogoHandler),
+    (r"/price/([^/]+)", CompanyPriceHandler),
     (r"/name/([^/]+)", CompanyNameHandler),
     (r"/stats/([^/]+)", CompanyKeyStatsHandler),
     (r"/trchart/([^/]+)", ChartTRHandler),

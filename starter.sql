@@ -76,11 +76,17 @@ CREATE TABLE companyimage (
   url VARCHAR
 );
 
+CREATE TABLE companyprice (
+  id SERIAL NOT NULL PRIMARY KEY,
+  symbol VARCHAR,
+  price DOUBLE PRECISION
+);
+
 CREATE TABLE companyddm (
   id SERIAL NOT NULL PRIMARY KEY,
   symbol VARCHAR,
   time_stamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  ddm VARCHAR
+  ddm DOUBLE PRECISION
 );
 
 CREATE TABLE companynews (
