@@ -12,7 +12,7 @@ import math
 from matplotlib import style
 import matplotlib.pyplot as plt
 import matplotlib.mlab as mlab
-from apifuncs import get_api_companies_list, get_api_dev, get_api_financials, get_api_financials_cache, get_api_stats, get_api_stats_cache, get_tr_chart_data, get_cr_chart_data, get_gp_chart_data, get_oe_chart_data, get_oi_chart_data, get_ni_chart_data, get_api_news, get_api_news_cache, get_api_main, get_api_main_cache, get_ca_chart_data, get_ta_chart_data, get_tl_chart_data, get_cc_chart_data, get_cd_chart_data, get_tc_chart_data, get_td_chart_data, get_se_chart_data, get_ogl_chart_data, get_cf_chart_data
+from apifuncs import get_api_companies_list, get_api_dev, get_api_financials, get_api_financials_cache, get_api_stats, get_api_stats_cache, get_tr_chart_data, get_cr_chart_data, get_gp_chart_data, get_oe_chart_data, get_oi_chart_data, get_ni_chart_data, get_api_news, get_api_news_cache, get_api_main, get_api_main_cache, get_ca_chart_data, get_ta_chart_data, get_tl_chart_data, get_cc_chart_data, get_cd_chart_data, get_tc_chart_data, get_td_chart_data, get_se_chart_data, get_ogl_chart_data, get_cf_chart_data, get_api_ddm, get_api_ddm_cache
 
 import json
 import requests
@@ -116,7 +116,7 @@ class monte_carlo(tornado.web.RequestHandler):
       last_price = prices[-1]
       
       simulation_df = pd.DataFrame()
-      num_simulations = 6
+      num_simulations = 20
       predicted_days = 200
 
       #Create Each Simulation as a Column in df
@@ -152,22 +152,22 @@ class monte_carlo(tornado.web.RequestHandler):
       plt.grid(True,color='grey')
       plt.axhline(y=last_price, color='r', linestyle='-')
       # plt.savefig(symbol+".png")
-      plt.show()
-          # test = simulation_df.to_dict('split')
-          # test2 = test['data']
-          # test3 = dict(enumerate(test2))
-          # test4 = json.dumps(test3)
-          # mydict = {}
-          # key = 0
-          # for line in test2:
-          #     key += 1
-          #     mydict[key] = line
-          # my_new_list = []
-          # for key, line in enumerate(test2):
-          #     my_new_list.append(dict([(key, line)]))
-          # final = json.dumps(my_new_list)
-          # print(final)
-      # self.write(final)
+      # plt.show()
+      test = simulation_df.to_dict('split')
+      test2 = test['data']
+      test3 = dict(enumerate(test2))
+      test4 = json.dumps(test3)
+      mydict = {}
+      key = 0
+      for line in test2:
+          key += 1
+          mydict[key] = line
+      my_new_list = []
+      for key, line in enumerate(test2):
+          my_new_list.append(dict([(key, line)]))
+      final = json.dumps(my_new_list)
+      # print(final)
+      self.write(final)
 
 
 
@@ -426,7 +426,7 @@ class ChartOGLHandler(tornado.web.RequestHandler):
     get_ogl_chart_data(self, slug)
 
 
-class CompanyCFMHandler(tornado.web.RequestHandler):
+class CompanyDDMHandler(tornado.web.RequestHandler):
   def get (self, slug):
     print("setting headers!!!")
     self.set_header("Access-Control-Allow-Origin", "*")
@@ -436,7 +436,7 @@ class CompanyCFMHandler(tornado.web.RequestHandler):
     timeDelta = timedelta(minutes=1440)
     conn = psycopg2.connect("dbname=tickerworth user=postgres")
     cur = conn.cursor()
-    cur.execute("SELECT time_stamp FROM ddmvaluation WHERE symbol = (%s) LIMIT 1", [slug])
+    cur.execute("SELECT time_stamp FROM companyddm WHERE symbol = (%s) LIMIT 1", [slug])
     row = cur.fetchone()
     if row != None:
       db_timestamp = row[0]
@@ -453,7 +453,7 @@ def make_app():
     (r"/main/([^/]+)", CompanyMainHandler),
     (r"/mcarlo/([^/]+)", monte_carlo),
     (r"/fin/([^/]+)", CompanyKeyFinancialsHandler),
-    # (r"/ddm/([^/]+)", CompanyDDMHandler),
+    (r"/ddm/([^/]+)", CompanyDDMHandler),
     (r"/news/([^/]+)", CompanyNewsHandler),
     (r"/logo/([^/]+)", CompanyLogoHandler),
     (r"/name/([^/]+)", CompanyNameHandler),

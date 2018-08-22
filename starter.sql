@@ -76,6 +76,13 @@ CREATE TABLE companyimage (
   url VARCHAR
 );
 
+CREATE TABLE companyddm (
+  id SERIAL NOT NULL PRIMARY KEY,
+  symbol VARCHAR,
+  time_stamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  ddm VARCHAR
+);
+
 CREATE TABLE companynews (
   id SERIAL NOT NULL PRIMARY KEY,
   symbol VARCHAR,

@@ -1,6 +1,7 @@
 import requests
 import json
 import psycopg2
+import pandas as pd
 from pprint import pprint
 from datetime import datetime
 
@@ -348,34 +349,86 @@ def get_api_main_cache(self, slug):
 
 
 def get_api_ddm(self, slug):
-    print('requesting API for company main info')
-    r = requests.get('https://api.iextrading.com/1.0/stock/'+ slug + '/company')
-    maininfodata = r.json()
-    maindata_list = []
-    maindata_list.append(maininfodata)
-    dt = datetime.utcnow()
-    conn = psycopg2.connect("dbname=tickerworth user=postgres")
-    cur = conn.cursor()
-    cur.execute("DELETE FROM companymaininfo WHERE symbol = (%s)", [slug])
-    for report in maindata_list:
-        cur.execute("""INSERT INTO companymaininfo VALUES (DEFAULT,%s, %s, %s, %s, %s, %s, %s, %s)""",
-        (slug, dt, report['website'], report['industry'], report['exchange'], report['CEO'], report['sector'], report['description']))
-        conn.commit()
-    cur.execute("""SELECT website, industry, exchange, ceo, sector, description FROM companymaininfo WHERE symbol = (%s)""", [slug])
-    maindata_db = [dict((cur.description[i][0], value) \
-                for i, value in enumerate(row)) for row in cur.fetchall()]
-    maindata_json = json.dumps(maindata_db)
-    self.write(maindata_json)
-    cur.close()
-    conn.close()
+    print('requesting APIs for the dividend-discount-model calculations')
+    r_1 = requests.get('https://api.iextrading.com/1.0/stock/'+ slug +'/dividends/5y')
+    divdata = r_1.json()
+    r_2 = requests.get('https://api.iextrading.com/1.0/stock/'+ slug +'/splits/5y')
+    splits = r_2.json()
+    splits_length = len(splits)
+    if splits_length > 1:
+        print('More than 1 split in 5 years!. Will not calculate DDM')
+    else:
+        # print(divdata)
+        split_date = splits[0]['declaredDate']
+        ratio = splits[0]['ratio']
+        dividends = []
+        for x in divdata:
+            if x['declaredDate'] <= split_date:
+                new_amount = x['amount'] * ratio
+                dividends.append(new_amount)
+            else:
+                dividends.append(x['amount'])
+                rev_dividends = dividends[::-1]
+                declared_dates = []
+                for r in divdata:
+                    declared_dates.append(r['declaredDate'])
+
+                rev_declared_dates = declared_dates[::-1]
+
+                df = pd.DataFrame({
+                    'AAPL': rev_dividends},
+                    index=rev_declared_dates)
+                pc = df.pct_change()
+
+                mylist = list(pc[slug].values)
+                mylistfinal = mylist.pop(0)
+
+                quarterly_growth_rate = (sum(mylist)/len(mylist)) * 100
+                annual_growth_rate = (quarterly_growth_rate ** 3) / 100
+
+                r_3 = requests.get('https://www.quandl.com/api/v3/datasets/USTREASURY/YIELD.json?api_key=gvcTKFWqWYJ5tD2Y--q7&start_date=2018-08-15')
+                us_treasury_data = r_3.json()
+                treasury_rate = us_treasury_data['dataset']['data'][0][9]
+                treasury_rate_adjusted = treasury_rate/100
+
+                # using the average annualized total return for the S&P 500 index over the past 5 years (july-2013-august-2018), which is 10.98% percent. No API for this.
+                sp500 = 0.1098
+
+                r_4 = requests.get('https://api.iextrading.com/1.0/stock/'+ slug +'/stats')
+                stats_data = r_4.json()
+                beta = stats_data['beta']
+                r_5 = requests.get('https://api.iextrading.com/1.0/stock/'+ slug +'/stats')
+                comp_data = r_5.json()
+                div_rate = comp_data['dividendRate']
+                market_premium = sp500 - treasury_rate_adjusted
+                company_premium = beta * market_premium
+                capm = treasury_rate_adjusted + company_premium
+                numerator = div_rate * (1 + annual_growth_rate)
+                denominator = capm - annual_growth_rate
+                ddm_valuation = (div_rate * (1 + annual_growth_rate)) / (capm - annual_growth_rate)
+                dt = datetime.utcnow()
+                conn = psycopg2.connect("dbname=tickerworth user=postgres")
+                cur = conn.cursor()
+                cur.execute("DELETE FROM companyddm WHERE symbol = (%s)", [slug])
+                cur.execute("""INSERT INTO companyddm VALUES (DEFAULT,%s, %s, %s)""",
+                (slug, dt, ddm_valuation))
+                conn.commit()
+                cur.execute("""SELECT ddm FROM companyddm WHERE symbol = (%s)""", [slug])
+                ddm_db = cur.fetchall()
+                ddm_dict = { k: v for k, v in ddm_db}
+                ddm_json = json.dumps(ddm_dict)
+                self.write(ddm_json)
+                cur.close()
+                conn.close()
 
 def get_api_ddm_cache(self, slug):
     conn = psycopg2.connect("dbname=tickerworth user=postgres")
     cur = conn.cursor()
-    cur.execute("""SELECT website, industry, exchange, ceo, sector, description FROM companymaininfo WHERE symbol = (%s)""", [slug])
-    maindata_db = [dict((cur.description[i][0], value) \
-                for i, value in enumerate(row)) for row in cur.fetchall()]
-    maindata_json = json.dumps(maindata_db)
-    self.write(maindata_json)
+    cur.execute("""SELECT ddm FROM companyddm WHERE symbol = (%s)""", [slug])
+    ddm_db = [dict((cur.description[i][0], value) \
+            for i, value in enumerate(row)) for row in cur.fetchall()]
+    # ddm_dict = { : v for k, v in ddm_db}
+    ddm_json = json.dumps(ddm_db)
+    self.write(ddm_json)
     cur.close()
     conn.close()
