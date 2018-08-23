@@ -20,6 +20,7 @@ import json
 import requests
 import threading
 
+is_prod = os.environ.get('IS_HEROKU', None)
 
 def set_interval(func, sec):
     def func_wrapper():
@@ -29,8 +30,8 @@ def set_interval(func, sec):
     t.start()
     return t
 
-env = os.environ.get("PYTHON_ENV")
-if env == "production":
+
+if is_prod:
   print('In production. Timer has started for company listing check/update')
   set_interval(companyListing, 7200)
 else:
