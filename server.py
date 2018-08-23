@@ -20,7 +20,33 @@ import json
 import requests
 import threading
 
+# must put this (heroku config:set IS_HEROKU=True) in terminal in the app folder you are working on for the line after this to work. Without the parenthesis of course.
 is_prod = os.environ.get('IS_HEROKU', None)
+
+
+def companyListing():
+  conn = psycopg2.connect(os.environ.get('DATABASE_URL', 'postgres://postgres@localhost:5432/tickerworth'))
+  cur = conn.cursor()
+  cur.execute("SELECT EXTRACT(YEAR FROM pulldate) as year, EXTRACT(MONTH FROM pulldate) as month, EXTRACT(DAY FROM pulldate) as day FROM companylist LIMIT 1")
+  pulldate = cur.fetchone()
+  if pulldate == None:
+    updateCompanyListing()
+    cur.close()
+    conn.close()
+  else:
+    db_date = []
+    for d in pulldate:
+      db_date.append(int(d))
+    currentMonth = datetime.now().month
+    currentYear = datetime.now().year
+    currentDay = datetime.now().day
+    if db_date[0] == currentYear and db_date[1] == currentMonth and db_date[2] == currentDay:
+      print('Database has most current data')
+    else:
+      updateCompanyListing()
+      cur.close()
+      conn.close()
+
 
 def set_interval(func, sec):
     def func_wrapper():
@@ -51,29 +77,6 @@ def updateCompanyListing():
   for company in listings:
     cur.execute("INSERT INTO companylist VALUES (DEFAULT,%s, %s, %s, %s, %s)",(company['symbol'], company['name'], company['date'], company['type'], company['iexId']))
     conn.commit()
-
-def companyListing():
-  conn = psycopg2.connect(os.environ.get('DATABASE_URL', 'postgres://postgres@localhost:5432/tickerworth'))
-  cur = conn.cursor()
-  cur.execute("SELECT EXTRACT(YEAR FROM pulldate) as year, EXTRACT(MONTH FROM pulldate) as month, EXTRACT(DAY FROM pulldate) as day FROM companylist LIMIT 1")
-  pulldate = cur.fetchone()
-  if pulldate == None:
-    updateCompanyListing()
-    cur.close()
-    conn.close()
-  else:
-    db_date = []
-    for d in pulldate:
-      db_date.append(int(d))
-    currentMonth = datetime.now().month
-    currentYear = datetime.now().year
-    currentDay = datetime.now().day
-    if db_date[0] == currentYear and db_date[1] == currentMonth and db_date[2] == currentDay:
-      print('Database has most current data')
-    else:
-      updateCompanyListing()
-      cur.close()
-      conn.close()
 
 
 companyListing()
