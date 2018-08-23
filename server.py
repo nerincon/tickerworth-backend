@@ -9,9 +9,11 @@ pd.core.common.is_list_like = pd.api.types.is_list_like
 import pandas_datareader.data as web
 import numpy as np
 import math
-from matplotlib import style
-import matplotlib.pyplot as plt
-import matplotlib.mlab as mlab
+# problem with deploying matplotlib to heroku. Do not need right now, but if need it in heroku in the future go back to this url to solve problem. url: https://stackoverflow.com/questions/43697460/import-matplotlib-failing-on-heroku
+#removed the matplotlib from requirements.txt. No need to modify Pipfile since Heroku is using requiremtns file I created.
+# from matplotlib import style
+# import matplotlib.pyplot as plt
+# import matplotlib.mlab as mlab
 from apifuncs import get_api_companies_list, get_api_dev, get_api_financials, get_api_financials_cache, get_api_stats, get_api_stats_cache, get_tr_chart_data, get_cr_chart_data, get_gp_chart_data, get_oe_chart_data, get_oi_chart_data, get_ni_chart_data, get_api_news, get_api_news_cache, get_api_main, get_api_main_cache, get_ca_chart_data, get_ta_chart_data, get_tl_chart_data, get_cc_chart_data, get_cd_chart_data, get_tc_chart_data, get_td_chart_data, get_se_chart_data, get_ogl_chart_data, get_cf_chart_data, get_api_ddm, get_api_ddm_cache
 
 import json
@@ -141,16 +143,16 @@ class monte_carlo(tornado.web.RequestHandler):
           simulation_df[x] = price_series
       
       last_price = prices[-1]
-      fig = plt.figure()
-      style.use('bmh')
+      # fig = plt.figure()
+      # style.use('bmh')
       
-      title = "Monte Carlo Simulation: " + str(predicted_days) + " Days"
-      plt.plot(simulation_df)
-      fig.suptitle(title,fontsize=18, fontweight='bold')
-      plt.xlabel('Day')
-      plt.ylabel('Price ($USD)')
-      plt.grid(True,color='grey')
-      plt.axhline(y=last_price, color='r', linestyle='-')
+      # title = "Monte Carlo Simulation: " + str(predicted_days) + " Days"
+      # plt.plot(simulation_df)
+      # fig.suptitle(title,fontsize=18, fontweight='bold')
+      # plt.xlabel('Day')
+      # plt.ylabel('Price ($USD)')
+      # plt.grid(True,color='grey')
+      # plt.axhline(y=last_price, color='r', linestyle='-')
       # plt.savefig(symbol+".png")
       # plt.show()
       test = simulation_df.to_dict('split')
