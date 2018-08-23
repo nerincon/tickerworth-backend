@@ -1,3 +1,4 @@
+import os
 import requests
 import json
 import psycopg2
@@ -21,7 +22,7 @@ def get_api_companies_list():
 
 
 def get_tr_chart_data(self, ticker):
-    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    conn = psycopg2.connect(os.environ.get('DATABASE_URL', 'postgres://postgres@localhost:5432/tickerworth'))
     cur = conn.cursor()
     cur.execute("SELECT to_char(reportdate, 'YYYY:MM:DD') as x, totalrevenue as y FROM keyfinancials  WHERE symbol = (%s)", [ticker])
     tr_data = [dict((cur.description[i][0], value) for i, value in enumerate(row)) for row in cur.fetchall()]
@@ -32,7 +33,7 @@ def get_tr_chart_data(self, ticker):
 
 
 def get_cr_chart_data(self, ticker):
-    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    conn = psycopg2.connect(os.environ.get('DATABASE_URL', 'postgres://postgres@localhost:5432/tickerworth'))
     cur = conn.cursor()
     cur.execute("SELECT to_char(reportdate, 'YYYY:MM:DD') as x, costofrevenue as y FROM keyfinancials  WHERE symbol = (%s)", [ticker])
     cr_data = [dict((cur.description[i][0], value) for i, value in enumerate(row)) for row in cur.fetchall()]
@@ -43,7 +44,7 @@ def get_cr_chart_data(self, ticker):
 
 
 def get_gp_chart_data(self, ticker):
-    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    conn = psycopg2.connect(os.environ.get('DATABASE_URL', 'postgres://postgres@localhost:5432/tickerworth'))
     cur = conn.cursor()
     cur.execute("SELECT to_char(reportdate, 'YYYY:MM:DD') as x, grossprofit as y FROM keyfinancials  WHERE symbol = (%s)", [ticker])
     gp_data = [dict((cur.description[i][0], value) for i, value in enumerate(row)) for row in cur.fetchall()]
@@ -54,7 +55,7 @@ def get_gp_chart_data(self, ticker):
 
 
 def get_oe_chart_data(self, ticker):
-    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    conn = psycopg2.connect(os.environ.get('DATABASE_URL', 'postgres://postgres@localhost:5432/tickerworth'))
     cur = conn.cursor()
     cur.execute("SELECT to_char(reportdate, 'YYYY:MM:DD') as x, operatingexpense as y FROM keyfinancials  WHERE symbol = (%s)", [ticker])
     oe_data = [dict((cur.description[i][0], value) for i, value in enumerate(row)) for row in cur.fetchall()]
@@ -65,7 +66,7 @@ def get_oe_chart_data(self, ticker):
 
 
 def get_oi_chart_data(self, ticker):
-    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    conn = psycopg2.connect(os.environ.get('DATABASE_URL', 'postgres://postgres@localhost:5432/tickerworth'))
     cur = conn.cursor()
     cur.execute("SELECT to_char(reportdate, 'YYYY:MM:DD') as x, operatingincome as y FROM keyfinancials  WHERE symbol = (%s)", [ticker])
     oi_data = [dict((cur.description[i][0], value) for i, value in enumerate(row)) for row in cur.fetchall()]
@@ -76,7 +77,7 @@ def get_oi_chart_data(self, ticker):
 
 
 def get_ni_chart_data(self, ticker):
-    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    conn = psycopg2.connect(os.environ.get('DATABASE_URL', 'postgres://postgres@localhost:5432/tickerworth'))
     cur = conn.cursor()
     cur.execute("SELECT to_char(reportdate, 'YYYY:MM:DD') as x, netincome as y FROM keyfinancials  WHERE symbol = (%s)", [ticker])
     ni_data = [dict((cur.description[i][0], value) for i, value in enumerate(row)) for row in cur.fetchall()]
@@ -87,7 +88,7 @@ def get_ni_chart_data(self, ticker):
 
 
 def get_ca_chart_data(self, ticker):
-    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    conn = psycopg2.connect(os.environ.get('DATABASE_URL', 'postgres://postgres@localhost:5432/tickerworth'))
     cur = conn.cursor()
     cur.execute("SELECT to_char(reportdate, 'YYYY:MM:DD') as x, currentassets as y FROM keyfinancials  WHERE symbol = (%s)", [ticker])
     ca_data = [dict((cur.description[i][0], value) for i, value in enumerate(row)) for row in cur.fetchall()]
@@ -97,7 +98,7 @@ def get_ca_chart_data(self, ticker):
     conn.close()
 
 def get_ta_chart_data(self, ticker):
-    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    conn = psycopg2.connect(os.environ.get('DATABASE_URL', 'postgres://postgres@localhost:5432/tickerworth'))
     cur = conn.cursor()
     cur.execute("SELECT to_char(reportdate, 'YYYY:MM:DD') as x, totalassets as y FROM keyfinancials  WHERE symbol = (%s)", [ticker])
     ta_data = [dict((cur.description[i][0], value) for i, value in enumerate(row)) for row in cur.fetchall()]
@@ -107,7 +108,7 @@ def get_ta_chart_data(self, ticker):
     conn.close()
 
 def get_tl_chart_data(self, ticker):
-    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    conn = psycopg2.connect(os.environ.get('DATABASE_URL', 'postgres://postgres@localhost:5432/tickerworth'))
     cur = conn.cursor()
     cur.execute("SELECT to_char(reportdate, 'YYYY:MM:DD') as x, totalliabilities as y FROM keyfinancials  WHERE symbol = (%s)", [ticker])
     tl_data = [dict((cur.description[i][0], value) for i, value in enumerate(row)) for row in cur.fetchall()]
@@ -117,7 +118,7 @@ def get_tl_chart_data(self, ticker):
     conn.close()
 
 def get_cc_chart_data(self, ticker):
-    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    conn = psycopg2.connect(os.environ.get('DATABASE_URL', 'postgres://postgres@localhost:5432/tickerworth'))
     cur = conn.cursor()
     cur.execute("SELECT to_char(reportdate, 'YYYY:MM:DD') as x, currentcash as y FROM keyfinancials  WHERE symbol = (%s)", [ticker])
     cc_data = [dict((cur.description[i][0], value) for i, value in enumerate(row)) for row in cur.fetchall()]
@@ -127,7 +128,7 @@ def get_cc_chart_data(self, ticker):
     conn.close()
 
 def get_cd_chart_data(self, ticker):
-    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    conn = psycopg2.connect(os.environ.get('DATABASE_URL', 'postgres://postgres@localhost:5432/tickerworth'))
     cur = conn.cursor()
     cur.execute("SELECT to_char(reportdate, 'YYYY:MM:DD') as x, currentdebt as y FROM keyfinancials  WHERE symbol = (%s)", [ticker])
     cd_data = [dict((cur.description[i][0], value) for i, value in enumerate(row)) for row in cur.fetchall()]
@@ -137,7 +138,7 @@ def get_cd_chart_data(self, ticker):
     conn.close()
 
 def get_tc_chart_data(self, ticker):
-    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    conn = psycopg2.connect(os.environ.get('DATABASE_URL', 'postgres://postgres@localhost:5432/tickerworth'))
     cur = conn.cursor()
     cur.execute("SELECT to_char(reportdate, 'YYYY:MM:DD') as x, totalcash as y FROM keyfinancials  WHERE symbol = (%s)", [ticker])
     tc_data = [dict((cur.description[i][0], value) for i, value in enumerate(row)) for row in cur.fetchall()]
@@ -147,7 +148,7 @@ def get_tc_chart_data(self, ticker):
     conn.close()
 
 def get_td_chart_data(self, ticker):
-    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    conn = psycopg2.connect(os.environ.get('DATABASE_URL', 'postgres://postgres@localhost:5432/tickerworth'))
     cur = conn.cursor()
     cur.execute("SELECT to_char(reportdate, 'YYYY:MM:DD') as x, totaldebt as y FROM keyfinancials  WHERE symbol = (%s)", [ticker])
     td_data = [dict((cur.description[i][0], value) for i, value in enumerate(row)) for row in cur.fetchall()]
@@ -157,7 +158,7 @@ def get_td_chart_data(self, ticker):
     conn.close()
 
 def get_se_chart_data(self, ticker):
-    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    conn = psycopg2.connect(os.environ.get('DATABASE_URL', 'postgres://postgres@localhost:5432/tickerworth'))
     cur = conn.cursor()
     cur.execute("SELECT to_char(reportdate, 'YYYY:MM:DD') as x, shareholderequity as y FROM keyfinancials  WHERE symbol = (%s)", [ticker])
     se_data = [dict((cur.description[i][0], value) for i, value in enumerate(row)) for row in cur.fetchall()]
@@ -167,7 +168,7 @@ def get_se_chart_data(self, ticker):
     conn.close()
 
 def get_cf_chart_data(self, ticker):
-    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    conn = psycopg2.connect(os.environ.get('DATABASE_URL', 'postgres://postgres@localhost:5432/tickerworth'))
     cur = conn.cursor()
     cur.execute("SELECT to_char(reportdate, 'YYYY:MM:DD') as x, cashflow as y FROM keyfinancials  WHERE symbol = (%s)", [ticker])
     cf_data = [dict((cur.description[i][0], value) for i, value in enumerate(row)) for row in cur.fetchall()]
@@ -177,7 +178,7 @@ def get_cf_chart_data(self, ticker):
     conn.close()
 
 def get_ogl_chart_data(self, ticker):
-    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    conn = psycopg2.connect(os.environ.get('DATABASE_URL', 'postgres://postgres@localhost:5432/tickerworth'))
     cur = conn.cursor()
     cur.execute("SELECT to_char(reportdate, 'YYYY:MM:DD') as x, operatinggainsandloses as y FROM keyfinancials  WHERE symbol = (%s)", [ticker])
     ogl_data = [dict((cur.description[i][0], value) for i, value in enumerate(row)) for row in cur.fetchall()]
@@ -192,7 +193,7 @@ def get_api_financials(self, ticker):
     r = requests.get('https://api.iextrading.com/1.0/stock/'+ ticker + '/financials?period=annual')
     findata = r.json()
     dt = datetime.utcnow()
-    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    conn = psycopg2.connect(os.environ.get('DATABASE_URL', 'postgres://postgres@localhost:5432/tickerworth'))
     cur = conn.cursor()
     cur.execute("DELETE FROM keyfinancials WHERE symbol = (%s)", [ticker])
     for report in findata['financials']:
@@ -216,7 +217,7 @@ def get_api_financials(self, ticker):
     conn.close()
 
 def get_api_financials_cache(self, ticker):
-    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    conn = psycopg2.connect(os.environ.get('DATABASE_URL', 'postgres://postgres@localhost:5432/tickerworth'))
     cur = conn.cursor()
     cur.execute("""SELECT to_char(reportdate, 'YYYY:MM:DD') as reportdate, grossprofit::float8::numeric::money, costofrevenue::float8::numeric::money, 
     operatingrevenue::float8::numeric::money, totalrevenue::float8::numeric::money, operatingincome::float8::numeric::money, netincome::float8::numeric::money,
@@ -240,7 +241,7 @@ def get_api_stats(self, ticker):
     statsdata_list = []
     statsdata_list.append(statsdata)
     dt = datetime.utcnow()
-    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    conn = psycopg2.connect(os.environ.get('DATABASE_URL', 'postgres://postgres@localhost:5432/tickerworth'))
     cur = conn.cursor()
     cur.execute("DELETE FROM keystats WHERE symbol = (%s)", [ticker])
     for stats in statsdata_list:
@@ -264,7 +265,7 @@ def get_api_stats(self, ticker):
 
 
 def get_api_stats_cache(self, ticker):
-    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    conn = psycopg2.connect(os.environ.get('DATABASE_URL', 'postgres://postgres@localhost:5432/tickerworth'))
     cur = conn.cursor()
     cur.execute("""SELECT marketcap::float8::numeric::money, beta, week52high, week52low, week52change, dividendrate, dividendyield, latesteps, to_char(latestepsdate, 'YYYY:MM:DD'), 
     sharesoutstanding, returnonequity, concensuseps, ebitda::float8::numeric::money, revenue::float8::numeric::money, grossprofit::float8::numeric::money,
@@ -283,7 +284,7 @@ def get_api_news(self, ticker):
     r = requests.get('https://api.iextrading.com/1.0/stock/'+ ticker + '/news/last/50')
     newsdata = r.json()
     dt = datetime.utcnow()
-    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    conn = psycopg2.connect(os.environ.get('DATABASE_URL', 'postgres://postgres@localhost:5432/tickerworth'))
     cur = conn.cursor()
     cur.execute("DELETE FROM companynews WHERE symbol = (%s)", [ticker])
     for report in newsdata:
@@ -299,7 +300,7 @@ def get_api_news(self, ticker):
     conn.close()
 
 def get_api_news_cache(self, ticker):
-    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    conn = psycopg2.connect(os.environ.get('DATABASE_URL', 'postgres://postgres@localhost:5432/tickerworth'))
     cur = conn.cursor()
     cur.execute("""SELECT to_char(newsdate, 'YYYY:MM:DD') as newsdate, headline, source, url, summary FROM companynews WHERE symbol = (%s)""", [ticker])
     newsdata_db = [dict((cur.description[i][0], value) \
@@ -317,7 +318,7 @@ def get_api_main(self, ticker):
     maindata_list = []
     maindata_list.append(maininfodata)
     dt = datetime.utcnow()
-    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    conn = psycopg2.connect(os.environ.get('DATABASE_URL', 'postgres://postgres@localhost:5432/tickerworth'))
     cur = conn.cursor()
     cur.execute("DELETE FROM companymaininfo WHERE symbol = (%s)", [ticker])
     for report in maindata_list:
@@ -333,7 +334,7 @@ def get_api_main(self, ticker):
     conn.close()
 
 def get_api_main_cache(self, ticker):
-    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    conn = psycopg2.connect(os.environ.get('DATABASE_URL', 'postgres://postgres@localhost:5432/tickerworth'))
     cur = conn.cursor()
     cur.execute("""SELECT website, industry, exchange, ceo, sector, description FROM companymaininfo WHERE symbol = (%s)""", [ticker])
     maindata_db = [dict((cur.description[i][0], value) \
@@ -403,7 +404,7 @@ def get_api_ddm(self, ticker):
     denominator = capm - annual_growth_rate
     ddm_valuation = (div_rate * (1 + annual_growth_rate)) / (capm - annual_growth_rate)
     dt = datetime.utcnow()
-    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    conn = psycopg2.connect(os.environ.get('DATABASE_URL', 'postgres://postgres@localhost:5432/tickerworth'))
     cur = conn.cursor()
     cur.execute("""INSERT INTO companyddm VALUES (DEFAULT,%s, %s, %s)""",
     (ticker, dt, ddm_valuation))
@@ -417,7 +418,7 @@ def get_api_ddm(self, ticker):
     conn.close()
 
 def get_api_ddm_cache(self, ticker):
-    conn = psycopg2.connect("dbname=tickerworth user=postgres")
+    conn = psycopg2.connect(os.environ.get('DATABASE_URL', 'postgres://postgres@localhost:5432/tickerworth'))
     cur = conn.cursor()
     cur.execute("""SELECT ddm FROM companyddm WHERE symbol = (%s)""", [ticker])
     ddm_db = cur.fetchall()
