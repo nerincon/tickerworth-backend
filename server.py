@@ -128,7 +128,7 @@ class monte_carlo(tornado.web.RequestHandler):
       self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
       self.set_header('Content-Type', 'application/json')
       #Dates
-      start = datetime(2017, 1, 3)
+      start = datetime(2015, 1, 3)
       end = datetime(2017, 10, 4)
       
       prices = web.DataReader(symbol, 'iex',start, end)['close']
