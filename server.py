@@ -65,12 +65,11 @@ else:
 
 
 def updateCompanyListing():
-  env = os.environ.get("PYTHON_ENV")
   print('Database updating. Data being loaded from API to get most current company listing.')
   conn = psycopg2.connect(os.environ.get('DATABASE_URL', 'postgres://postgres@localhost:5432/tickerworth'))
   cur = conn.cursor()
   cur.execute("DELETE FROM companylist")
-  if env == "production":
+  if is_prod:
     listings = get_api_companies_list()
   else:
     listings = get_api_dev()
