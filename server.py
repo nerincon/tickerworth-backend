@@ -81,6 +81,22 @@ def updateCompanyListing():
 companyListing()
 
 
+class CompanyListingsHandler(tornado.web.RequestHandler):
+  def.get(self):
+    self.set_header("Access-Control-Allow-Origin", "*")
+    self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+    self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+    self.set_header('Content-Type', 'application/json')
+    conn = psycopg2.connect(os.environ.get('DATABASE_URL', 'postgres://postgres@localhost:5432/tickerworth'))
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM companylist")
+    company_list = cur.fetchall()
+    company_list_json = json.dumps(company_list)
+    self.write(company_list_json)
+    cur.close()
+    conn.close()
+
+
 class CompanyMainHandler(tornado.web.RequestHandler):
   def get (self, ticker):
     print("setting headers!!!")
@@ -488,6 +504,7 @@ class CompanyDDMHandler(tornado.web.RequestHandler):
 def make_app():
   return tornado.web.Application([
     (r"/main/([^/]+)", CompanyMainHandler),
+    (r"/listings/([^/]+)", CompanyListingsHandler),
     (r"/mcarlo/([^/]+)", monte_carlo),
     (r"/fin/([^/]+)", CompanyKeyFinancialsHandler),
     (r"/ddm/([^/]+)", CompanyDDMHandler),
