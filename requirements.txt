@@ -1,0 +1,7 @@
+tornado
+psycopg2
+requests
+pandas
+numpy
+matplotlib
+pandas-datareader
