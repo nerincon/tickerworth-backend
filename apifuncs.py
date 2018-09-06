@@ -348,20 +348,44 @@ def get_api_main_cache(self, ticker):
 
 def get_api_ddm(self, ticker):
     print('requesting APIs for the dividend-discount-model calculations')
+    dt = datetime.utcnow()
+    conn = psycopg2.connect(os.environ.get('DATABASE_URL', 'postgres://postgres@localhost:5432/tickerworth'))
+    cur = conn.cursor()
     r_1 = requests.get('https://api.iextrading.com/1.0/stock/'+ ticker +'/dividends/5y')
     divdata = r_1.json()
     r_2 = requests.get('https://api.iextrading.com/1.0/stock/'+ ticker +'/splits/5y')
     splits = r_2.json()
     splits_length = len(splits)
-    if splits_length > 1:
-        print('More than 1 split in 5 years!. Will not calculate DDM')
+    divdata_length = len(divdata)
+    split_date = []
+    ratio = []
+    if not splits:
+        split_date.append('12/31/1900')
+        ratio.append(1)
     else:
-        split_date = splits[0]['declaredDate']
-        ratio = splits[0]['ratio']
+        split_date.append(splits[0]['declaredDate'])
+        ratio.append(splits[0]['ratio'])
+    print('split_date: ', split_date)
+    print('ratio: ', ratio)
+    if splits_length > 1 or divdata_length < 20:
+        print('More than 1 split in 5 years! or Less than 5 years of dividend data. Will not calculate DDM')
+        ddm_valuation = 0
+        cur.execute("""INSERT INTO companyddm VALUES (DEFAULT,%s, %s, %s)""",
+        (ticker, dt, ddm_valuation))
+        conn.commit()
+        cur.execute("""SELECT ddm FROM companyddm WHERE symbol = (%s)""", [ticker])
+        ddm_db = cur.fetchall()
+        ddm_dict = { 'ddm': x for x in ddm_db}
+        ddm_json = json.dumps(ddm_dict)
+        self.write(ddm_json)
+        cur.close()
+        conn.close()
+        return False
+    else:
         dividends = []
         for x in divdata:
-            if x['declaredDate'] <= split_date:
-                new_amount = x['amount'] * ratio
+            if x['declaredDate'] <= split_date[0]:
+                new_amount = x['amount'] * ratio[0]
                 dividends.append(new_amount)
             else:
                 dividends.append(x['amount'])
@@ -377,11 +401,10 @@ def get_api_ddm(self, ticker):
         index=rev_declared_dates)
     pc = df.pct_change()
 
-    mylist = list(pc[ticker].values)
-    mylistfinal = mylist.pop(0)
-
-    quarterly_growth_rate = (sum(mylist)/len(mylist)) * 100
-    annual_growth_rate = (quarterly_growth_rate ** 3) / 100
+    percent_dividend_changes = list(pc[ticker].values)
+    percent_dividend_changes_modified = percent_dividend_changes.pop(0)
+    percent_dividend_changes_final = list(filter(lambda x: x != 0, percent_dividend_changes))
+    annual_growth_rate = (sum(percent_dividend_changes_final)/4)
 
     r_3 = requests.get('https://www.quandl.com/api/v3/datasets/USTREASURY/YIELD.json?api_key=gvcTKFWqWYJ5tD2Y--q7&start_date=2018-08-15')
     us_treasury_data = r_3.json()
@@ -402,10 +425,11 @@ def get_api_ddm(self, ticker):
     capm = treasury_rate_adjusted + company_premium
     numerator = div_rate * (1 + annual_growth_rate)
     denominator = capm - annual_growth_rate
-    ddm_valuation = (div_rate * (1 + annual_growth_rate)) / (capm - annual_growth_rate)
-    dt = datetime.utcnow()
-    conn = psycopg2.connect(os.environ.get('DATABASE_URL', 'postgres://postgres@localhost:5432/tickerworth'))
-    cur = conn.cursor()
+    ddm_valuation = None
+    if (numerator/denominator) < 0:
+        ddm_valuation = 0
+    else:
+        ddm_valuation = numerator / denominator
     cur.execute("""INSERT INTO companyddm VALUES (DEFAULT,%s, %s, %s)""",
     (ticker, dt, ddm_valuation))
     conn.commit()

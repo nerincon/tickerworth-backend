@@ -175,21 +175,18 @@ class monte_carlo(tornado.web.RequestHandler):
       # plt.axhline(y=last_price, color='r', linestyle='-')
       # plt.savefig(symbol+".png")
       # plt.show()
-      test = simulation_df.to_dict('split')
-      test2 = test['data']
-      test3 = dict(enumerate(test2))
-      test4 = json.dumps(test3)
-      mydict = {}
+      simulation_values_dict = simulation_df.to_dict('split')
+      simulation_values_dict_modified = simulation_values_dict['data']
+      simulation_values_dict_final = {}
       key = 0
-      for line in test2:
+      for line in simulation_values_dict_modified:
           key += 1
-          mydict[key] = line
-      my_new_list = []
-      for key, line in enumerate(test2):
-          my_new_list.append(dict([(key, line)]))
-      final = json.dumps(my_new_list)
-      # print(final)
-      self.write(final)
+          simulation_values_dict_final[key] = line
+      new_simulation_values_list = []
+      for key, line in enumerate(simulation_values_dict_modified):
+          new_simulation_values_list.append(dict([(key, line)]))
+      final_simulation_values_send = json.dumps(new_simulation_values_list)
+      self.write(final_simulation_values_send)
 
 
 
